@@ -1,4 +1,4 @@
-package TZ.Sys.Reflect;
+package TZ.sys.invoker.reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import TZ.Sys.Loader.SysLoader;
+import TZ.sys.invoker.loader.SysLoader;
 
 
 /**

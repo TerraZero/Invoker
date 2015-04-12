@@ -1,4 +1,4 @@
-package TZ.Sys.Loader;
+package TZ.sys.invoker.loader;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,35 +78,35 @@ public class SysLoader {
 		return SysLoader.defaultURL().getPath();
 	}
 	
-	protected List<Boot> boots;
+	protected List<SysFile> sysfiles;
 	
 	private SysLoader() {
 		
 	}
 	
-	public List<Boot> load() {
+	public List<SysFile> load() {
 		return this.load(false);
 	}
 	
-	public List<Boot> load(boolean force) {
-		if (force || this.boots == null) {
+	public List<SysFile> load(boolean force) {
+		if (force || this.sysfiles == null) {
 			this.init();
 		}
-		return this.boots;
+		return this.sysfiles;
 	}
 	
 	public void init() {
-		this.boots = new ArrayList<Boot>(1024);
+		this.sysfiles = new ArrayList<SysFile>(1024);
 		try {
 			for (URL url : SysLoader.loader().getURLs()) {
 				String file = url.getFile();
 				
 				if (file.endsWith(".jar")) {
 					ZipInputStream zip = new ZipInputStream(url.openStream());
-					this.loadZip(this.boots, zip);
+					this.loadZip(this.sysfiles, zip);
 					zip.close();
 				} else {
-					this.loadFile(this.boots, file, "");
+					this.loadFile(this.sysfiles, file, "");
 				}
 			}
 		} catch (Exception e) {
@@ -114,22 +114,22 @@ public class SysLoader {
 		}
 	}
 	
-	public void loadZip(List<Boot> boots, ZipInputStream zip) throws IOException {
+	public void loadZip(List<SysFile> boots, ZipInputStream zip) throws IOException {
 		ZipEntry entry = null;
 		
 		while ((entry = zip.getNextEntry()) != null) {
 			if (entry.getName().endsWith(".class")) {
-				boots.add(new Boot(entry));
+				boots.add(new SysFile(entry));
 			}
 		}
 	}
 	
-	public void loadFile(List<Boot> boots, String path, String internpath) {
+	public void loadFile(List<SysFile> boots, String path, String internpath) {
 		for (File f : new File(path).listFiles()) {
 			if (f.isDirectory()) {
 				this.loadFile(boots, path + "/" + f.getName(), internpath + "/" + f.getName());
 			} else if (f.isFile() && f.getName().endsWith(".class")) {
-				boots.add(new Boot(f, (internpath.length() == 0 ? "" : internpath.substring(1))));
+				boots.add(new SysFile(f, (internpath.length() == 0 ? "" : internpath.substring(1))));
 			}
 		}
 	}

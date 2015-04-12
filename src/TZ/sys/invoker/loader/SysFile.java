@@ -1,9 +1,10 @@
-package TZ.Sys.Loader;
+package TZ.sys.invoker.loader;
 
 import java.io.File;
 import java.util.zip.ZipEntry;
 
-import TZ.Sys.Reflect.Reflect;
+import TZ.sys.invoker.reflect.Reflect;
+import TZ.sys.invoker.reflect.Reflectable;
 
 /**
  * 
@@ -15,7 +16,7 @@ import TZ.Sys.Reflect.Reflect;
  * @identifier TZ.System
  *
  */
-public class Boot {
+public class SysFile implements Reflectable {
 	
 	public static String getZipName(String zipname) {
 		String[] parts = zipname.split("/");
@@ -44,15 +45,15 @@ public class Boot {
 	protected ZipEntry entry;
 	protected File file;
 	
-	public Boot(ZipEntry entry) {
+	public SysFile(ZipEntry entry) {
 		this.entry = entry;
-		this.name = Boot.getZipName(entry.getName());
-		this.path = Boot.getZipPath(entry.getName());
+		this.name = SysFile.getZipName(entry.getName());
+		this.path = SysFile.getZipPath(entry.getName());
 	}
 	
-	public Boot(File file, String path) {
+	public SysFile(File file, String path) {
 		this.file = file;
-		this.name = Boot.getFileName(file.getName());
+		this.name = SysFile.getFileName(file.getName());
 		this.path = path;
 	}
 	
