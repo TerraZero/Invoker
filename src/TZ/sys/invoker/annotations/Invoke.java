@@ -1,4 +1,4 @@
-package TZ.sys;
+package TZ.sys.invoker.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,21 +8,19 @@ import java.lang.annotation.Target;
 /**
  * 
  * @author terrazero
- * @created Apr 10, 2015
+ * @created Apr 13, 2015
  * 
- * @file Init.java
+ * @file Invoke.java
  * @project Invoker
- * @identifier TZ.sys
+ * @identifier TZ.sys.invoker
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Init {
-	
-	public String name();
-	
-	public String function() default "init";
+public @interface Invoke {
 
-	public int weight() default 0;
+	public String invoke();
+	
+	public String function() default "invoke";
 	
 }

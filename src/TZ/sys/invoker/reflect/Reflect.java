@@ -19,7 +19,7 @@ import TZ.sys.invoker.loader.SysLoader;
  * @identifier TZ.Reflect
  *
  */
-public class Reflect {
+public class Reflect implements Reflectable {
 
 	protected Class<?> reflectClass;
 	protected Object reflect;
@@ -36,7 +36,7 @@ public class Reflect {
 		this.reflect(reflect);
 	}
 	
-	public Class<?> reflect() {
+	public Class<?> getReflectType() {
 		return this.reflectClass;
 	}
 	
@@ -209,6 +209,14 @@ public class Reflect {
 	
 	public boolean implement(Class<?> implement) {
 		return Reflects.isImplement(this.reflectClass, implement);
+	}
+
+	/* 
+	 * @see TZ.sys.invoker.reflect.Reflectable#reflect()
+	 */
+	@Override
+	public Reflect reflect() {
+		return this;
 	}
 	
 }
