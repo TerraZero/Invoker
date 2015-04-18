@@ -1,7 +1,5 @@
 package TZ.sys.driver;
 
-import TZ.sys.Init;
-
 /**
  * 
  * @author terrazero
@@ -12,11 +10,6 @@ import TZ.sys.Init;
  * @identifier TZ.sys.driver
  *
  */
-@Init(name = "Drivers")
 public class Drivers {
-
-	public static void init() {
-		System.out.println("ok");
-	}
 	
 }

@@ -129,6 +129,10 @@ public class Reflect implements Reflectable {
 		return null;
 	}
 	
+	public CallFunc getCall(String function, Class<?>... parameters) {
+		return new CallFunc(this.reflect, Reflects.getFunctions(this.reflectClass, function, parameters));
+	}
+	
 	/**
 	 * Invoke all methods with the defined annotation
 	 * 
