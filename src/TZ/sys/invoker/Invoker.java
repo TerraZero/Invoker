@@ -21,10 +21,6 @@ import TZ.sys.invoker.reflect.Reflectable;
  */
 public class Invoker {
 	
-	public static void main(String[] args) {
-		
-	}
-	
 	public static<annotation extends Annotation> void each(Class<annotation> annotation, Consumer<InvokeWrapper<annotation>> consumer) {
 		Invoker.each(SysLoader.sysloader().load(), annotation, consumer);
 	}

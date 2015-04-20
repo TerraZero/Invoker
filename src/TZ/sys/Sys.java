@@ -1,10 +1,12 @@
 package TZ.sys;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import TZ.sys.invoker.Invoker;
 import TZ.sys.invoker.call.InvokeClass;
+import TZ.sys.invoker.reflect.InvokeWrapper;
 
 /**
  * 
@@ -25,8 +27,24 @@ public class Sys {
 	}
 
 	public static void init() {
-		Invoker.each(Init.class, (wrapper) -> {
-			wrapper.reflect().call(wrapper.annotation().function());
+		List<InvokeWrapper<Mod>> mods = Invoker.list(Mod.class);
+		
+		mods.forEach((wrapper) -> {
+			if (wrapper.annotation().boot().length() != 0) {
+				wrapper.reflect().call(wrapper.annotation().boot());
+			}
+		});
+		
+		mods.forEach((wrapper) -> {
+			if (wrapper.annotation().init().length() != 0) {
+				wrapper.reflect().call(wrapper.annotation().init());
+			}
+		});
+		
+		mods.forEach((wrapper) -> {
+			if (wrapper.annotation().register().length() != 0) {
+				wrapper.reflect().call(wrapper.annotation().register());
+			}
 		});
 	}
 	

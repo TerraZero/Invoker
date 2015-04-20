@@ -17,11 +17,15 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Init {
+public @interface Mod {
 	
 	public String name();
 	
-	public String function() default "init";
+	public String boot() default "";
+	
+	public String init() default "";
+	
+	public String register() default "";
 
 	public int weight() default 0;
 	
