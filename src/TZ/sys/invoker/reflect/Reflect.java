@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import TZ.sys.invoker.exceptions.ReflectException;
 import TZ.sys.invoker.loader.SysLoader;
 
 
@@ -42,7 +43,11 @@ public class Reflect implements Reflectable {
 	
 	@SuppressWarnings("unchecked")
 	public<type> type getReflect() {
-		return (type)this.reflect;
+		try {
+			return (type)this.reflect;
+		} catch (ClassCastException e) {
+			throw new ReflectException(e, this, "Reflection object can not cast into target type. (SOURCE: " + this.reflectClass + ")", 0);
+		}
 	}
 	
 	/**
@@ -54,11 +59,10 @@ public class Reflect implements Reflectable {
 	 */
 	public Reflect reflect(String load) {
 		try {
-			// TODO einen eigenen classloader erzeugen
 			this.reflectClass = SysLoader.loader().loadClass(load);
 			this.reflect = null;
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			throw new ReflectException(e, this, "ClassLoader can not find the class '" + load + "'", ReflectException.CAUSE_CLASS_NOT_FOUND);
 		}
 		return this;
 	}
@@ -93,15 +97,22 @@ public class Reflect implements Reflectable {
 	 */
 	public Reflect instantiate(boolean force, Object... args) {
 		if (this.reflect == null || force) {
+			Constructor<?> c = null;
 			try {
 				if (args.length == 0) {
 					this.reflect = this.reflectClass.newInstance();
 				} else {
-					Constructor<?> c = Reflects.getConstructor(this.reflectClass, Reflects.extractClasses(args));
+					c = Reflects.getConstructor(this.reflectClass, Reflects.extractClasses(args));
 					this.reflect = c.newInstance(Reflects.getParameter(args, c.getParameterTypes(), c.isVarArgs()));
 				}
-			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				e.printStackTrace();
+			} catch (InstantiationException e) {
+				throw new ReflectException(e, this, "Can not instantiate the object from class '" + this.reflectClass + "', width " + (args == null ? "0" : args.length) + " parameters, by construcktor '" + c + "'", 0);
+			} catch (IllegalAccessException e) {
+				throw new ReflectException(e, this, "Can not instantiate the object from class '" + this.reflectClass + "', width " + (args == null ? "0" : args.length) + " parameters, by construcktor '" + c + "'", ReflectException.CAUSE_PERMISSION);
+			} catch (IllegalArgumentException e) {
+				throw new ReflectException(e, this, "Can not instantiate the object from class '" + this.reflectClass + "', width " + (args == null ? "0" : args.length) + " parameters, by construcktor '" + c + "'", ReflectException.CAUSE_ARGUMENTS);
+			} catch (InvocationTargetException e) {
+				throw new ReflectException(e, this, "Can not instantiate the object from class '" + this.reflectClass + "', width " + (args == null ? "0" : args.length) + " parameters, by construcktor '" + c + "'", ReflectException.CAUSE_TARGET);
 			}
 		}
 		return this;
@@ -120,13 +131,19 @@ public class Reflect implements Reflectable {
 	 */
 	@SuppressWarnings("unchecked")
 	public<type> type call(String function, Object... parameters) {
+		Method method = null;
 		try {
-			Method method = Reflects.getFunctions(this.reflectClass, function, Reflects.extractClasses(parameters));
+			method = Reflects.getFunctions(this.reflectClass, function, Reflects.extractClasses(parameters));
 			return (type)method.invoke(this.reflect, parameters);
-		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+		} catch (SecurityException e) {
+			throw new ReflectException(e, this, "Can not call the " + (this.reflect == null ? "static " : "") + "method '" + method + "' from class '" + this.reflectClass + "', width " + (parameters == null ? "0" : parameters.length) + " parameters", 0);
+		} catch (IllegalAccessException e) {
+			throw new ReflectException(e, this, "Can not call the " + (this.reflect == null ? "static " : "") + "method '" + method + "' from class '" + this.reflectClass + "', width " + (parameters == null ? "0" : parameters.length) + " parameters", ReflectException.CAUSE_PERMISSION);
+		} catch (IllegalArgumentException e) {
+			throw new ReflectException(e, this, "Can not call the " + (this.reflect == null ? "static " : "") + "method '" + method + "' from class '" + this.reflectClass + "', width " + (parameters == null ? "0" : parameters.length) + " parameters", ReflectException.CAUSE_ARGUMENTS);
+		} catch (InvocationTargetException e) {
+			throw new ReflectException(e, this, "Can not call the " + (this.reflect == null ? "static " : "") + "method '" + method + "' from class '" + this.reflectClass + "', width " + (parameters == null ? "0" : parameters.length) + " parameters", ReflectException.CAUSE_TARGET);
 		}
-		return null;
 	}
 	
 	public CallFunc getCall(String function, Class<?>... parameters) {
@@ -142,6 +159,7 @@ public class Reflect implements Reflectable {
 	 * @throws ReflectException ON IllegalAccessException | IllegalArgumentException | InvocationTargetException
 	 * @return THIS
 	 */
+	@Deprecated
 	public Reflect call(Class<? extends Annotation> annotation, Object... parameters) {
 		List<Method> functions = Reflects.getFunctions(this.reflectClass, annotation);
 		
@@ -169,10 +187,15 @@ public class Reflect implements Reflectable {
 	public<type> type get(String field) {
 		try {
 			return (type)this.reflectClass.getField(field).get(this.reflect);
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			throw new ReflectException(e, this, "Can not get the value of " + (this.reflect == null ? "static " : "") + "field '" + field + "' from class '" + this.reflectClass, ReflectException.CAUSE_ARGUMENTS);
+		} catch (IllegalAccessException e) {
+			throw new ReflectException(e, this, "Can not get the value of " + (this.reflect == null ? "static " : "") + "field '" + field + "' from class '" + this.reflectClass, ReflectException.CAUSE_PERMISSION);
+		} catch (NoSuchFieldException e) {
+			throw new ReflectException(e, this, "Can not get the value of " + (this.reflect == null ? "static " : "") + "field '" + field + "' from class '" + this.reflectClass, ReflectException.CAUSE_FIELD_NOT_FOUND);
+		} catch (SecurityException e) {
+			throw new ReflectException(e, this, "Can not get the value of " + (this.reflect == null ? "static " : "") + "field '" + field + "' from class '" + this.reflectClass, 0);
 		}
-		return null;
 	}
 	
 	/**

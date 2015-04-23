@@ -36,14 +36,14 @@ public class Sys {
 		});
 		
 		mods.forEach((wrapper) -> {
-			if (wrapper.annotation().init().length() != 0) {
-				wrapper.reflect().call(wrapper.annotation().init());
+			if (wrapper.annotation().register().length() != 0) {
+				wrapper.reflect().call(wrapper.annotation().register());
 			}
 		});
 		
 		mods.forEach((wrapper) -> {
-			if (wrapper.annotation().register().length() != 0) {
-				wrapper.reflect().call(wrapper.annotation().register());
+			if (wrapper.annotation().init().length() != 0) {
+				wrapper.reflect().call(wrapper.annotation().init());
 			}
 		});
 	}

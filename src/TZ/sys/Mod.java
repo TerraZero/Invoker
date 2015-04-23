@@ -23,9 +23,9 @@ public @interface Mod {
 	
 	public String boot() default "";
 	
-	public String init() default "";
-	
 	public String register() default "";
+	
+	public String init() default "";
 
 	public int weight() default 0;
 	
